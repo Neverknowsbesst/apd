@@ -1,3 +1,21 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from typing import List, Optional
+import os
+
+app = FastAPI()
+
+# CORS para frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # en prod poner la URL real
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Tu función de simulación (la pego acá para que quede todo junto)
 def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabra):
     estado = estadoInicial
     palabra = palabra.strip()
@@ -33,16 +51,32 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
     else:
         return stack == ['R']
 
+# Modelos Pydantic para validar la entrada
+class SimulationRequest(BaseModel):
+    transitions: List[dict]  # cada dict tiene 'from' y 'to' (listas)
+    initial_state: str
+    acceptance_type: str
+    final_state: Optional[str] = None
+    input_word: str
 
-transiciones = {
-    ('q0', 'a', 'R'): ('q1', 'AR'),
-    ('q1', 'b', 'A'): ('q1', 'ε'),
-    ('q1', 'ε', 'R'): ('qf', 'ε')}
-print(simula_apd(transiciones, True, 'q0', 'qf', 'ab')
-)
-transiciones = {
-    ('q0', 'a', 'R'): ('q1', 'AR'),
-    ('q1', 'b', 'A'): ('q1', 'ε'),
-    ('q1', 'ε', 'R'): ('qf', 'ε')}
-print(simula_apd(transiciones, True, 'q0', 'qf', 'aa')
-)
+@app.post("/simulate")
+async def simulate(data: SimulationRequest):
+    # Convertir lista de transiciones (dicts) a dict de tuplas
+    # Ejemplo entrada de transicion: {"from": ["q0", "a", "R"], "to": ["q1", "AR"]}
+    transiciones = {}
+    for t in data.transitions:
+        from_tuple = tuple(t["from"])
+        to_tuple = tuple(t["to"])
+        transiciones[from_tuple] = to_tuple
+
+    aceptarPorFinal = (data.acceptance_type == "estado")
+    estadoInicial = data.initial_state
+    estadoFinal = data.final_state if data.final_state else ""
+    palabra = data.input_word
+
+    aceptada = simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabra)
+
+    return {"accepted": aceptada}
+
+# Sirve archivos estáticos (frontend)
+app.mount("/", StaticFiles(directory=os.path.dirname(__file__), html=True), name="static")
