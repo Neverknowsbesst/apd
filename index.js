@@ -31,13 +31,14 @@ document.getElementById("apd-form").addEventListener("submit", async function (e
   };
 
   try {
-    const response = await fetch("http://localhost:8000/simulate", {
+    const response = await fetch("/simulate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
+
 
     const result = await response.json();
     document.getElementById("result").textContent =
