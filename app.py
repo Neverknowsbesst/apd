@@ -39,7 +39,8 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
                 stack.pop()
             else:
                 for simbolo_transicion in reversed(escribir_en_stack):
-                    stack.append(simbolo_transicion)
+                    if simbolo_transicion != 'R':
+                        stack.append(simbolo_transicion)
 
             if simbolo != 'ε':
                 i += 1
