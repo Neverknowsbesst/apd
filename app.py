@@ -34,24 +34,24 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
         if transicion in transiciones:
             nuevo_estado, escribir_en_stack = transiciones[transicion]
             estado = nuevo_estado
-
-            if escribir_en_stack == 'ε' and stack[-1] != 'R':
+            if escribir_en_stack == 'ε':
                 stack.pop()
+            elif len(escribir_en_stack)==1:
+                pass
             else:
+                escribir_en_stack = escribir_en_stack[:-1]
                 for simbolo_transicion in reversed(escribir_en_stack):
-                    if simbolo_transicion != 'R':
-                        stack.append(simbolo_transicion)
+                    stack.append(simbolo_transicion)
 
-            if simbolo != 'ε':
+            if simbolo != 'ε' or (simbolo == 'ε' and simbolo_en_stack == 'R'):
                 i += 1
 
         else:
-            break
+            return False
     if aceptarPorFinal:
         return estado == estadoFinal
     else:
         return stack == ['R']
-
 # Modelos Pydantic para validar la entrada
 class SimulationRequest(BaseModel):
     transitions: List[dict]  # cada dict tiene 'from' y 'to' (listas)
