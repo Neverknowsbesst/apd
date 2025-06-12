@@ -34,7 +34,7 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
         if transicion in transiciones:
             nuevo_estado, escribir_en_stack = transiciones[transicion]
             estado = nuevo_estado
-            if escribir_en_stack == 'ε':
+            if escribir_en_stack == 'ε' and len(stack)!=1:
                 stack.pop()
             elif len(escribir_en_stack)==1:
                 pass
