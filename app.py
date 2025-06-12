@@ -7,15 +7,15 @@ import os
 
 app = FastAPI()
 
-# CORS para frontend
+# permisos para consultas
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # en prod poner la URL real
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Tu función de simulación (la pego acá para que quede todo junto)
+# Funcion que simula apd
 def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabra):
     estado = estadoInicial
     palabra = palabra.strip()
@@ -52,9 +52,9 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
         return estado == estadoFinal
     else:
         return stack == ['R']
-# Modelos Pydantic para validar la entrada
+# Modelos Pydantic para validar entrada
 class SimulationRequest(BaseModel):
-    transitions: List[dict]  # cada dict tiene 'from' y 'to' (listas)
+    transitions: List[dict]  # cada dict tiene from y to (listas)
     initial_state: str
     acceptance_type: str
     final_state: Optional[str] = None
@@ -79,5 +79,5 @@ async def simulate(data: SimulationRequest):
 
     return {"accepted": aceptada}
 
-# Sirve archivos estáticos (frontend)
+# monta archivos estaticos (frontend)
 app.mount("/", StaticFiles(directory=os.path.dirname(__file__), html=True), name="static")
