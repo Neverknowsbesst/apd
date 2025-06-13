@@ -43,7 +43,7 @@ def simula_apd(transiciones, aceptarPorFinal, estadoInicial, estadoFinal, palabr
                 for simbolo_transicion in reversed(escribir_en_stack):
                     stack.append(simbolo_transicion)
 
-            if simbolo != 'ε' or (simbolo == 'ε' and simbolo_en_stack == 'R'):
+            if simbolo != 'ε' or (simbolo == 'ε' and simbolo_en_stack == 'R') or estado == estadoFinal:
                 i += 1
 
         else:
